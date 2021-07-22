@@ -44,10 +44,10 @@ ecr\_scan\_reporter.lambda\_functions module
    :undoc-members:
    :show-inheritance:
 
-ecr\_scan\_reporter.scan\_trigger module
-----------------------------------------
+ecr\_scan\_reporter.repos\_scanner module
+-----------------------------------------
 
-.. automodule:: ecr_scan_reporter.scan_trigger
+.. automodule:: ecr_scan_reporter.repos_scanner
    :members:
    :undoc-members:
    :show-inheritance:
