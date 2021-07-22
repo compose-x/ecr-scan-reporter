@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "registryId": "000000000000",
+        "repositoryName": "python",
+        "imageId": {
+            "imageDigest": "sha256:86d48f7da580134430efe0d09d22ab17daee155fcfe52a760b9f8c8d00bb5daf",
+            "imageTag": "3.8.20210513-arm64v8"
+        },
+        "imageScanStatus": {
+            "status": "IN_PROGRESS"
+        },
+        "ResponseMetadata": {
+            "RequestId": "485fa856-c15a-40b3-9a44-82b801ec6701",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "485fa856-c15a-40b3-9a44-82b801ec6701",
+                "date": "Wed, 21 Jul 2021 12:04:21 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "232"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

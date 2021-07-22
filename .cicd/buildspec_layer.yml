@@ -1,0 +1,51 @@
+﻿---
+# BUILDSPEC to merge the .zip of different runtimes for the final layer
+version: 0.2
+env:
+  shell: /bin/bash
+  variables:
+    USE_EPOCH: 0
+    DIND_VOL_PATH: /var/lib/docker/volumes/agent-resources_user_volume/_data/srcDownload/src
+    PY_VERSION: 3.8
+    PUBLIC_FILES_BUCKET: files.compose-x.io
+
+phases:
+  install:
+    runtime-versions:
+      python: "$(echo $PY_VERSION)"
+    commands:
+      - COMMIT_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION::7}
+      - EPOCH=`date +'%Y%m%d-%H-%M'`
+      - SUFFIX=${COMMIT_HASH:-$EPOCH}
+      - if [ $USE_EPOCH -eq 1 ]; then SUFFIX=$EPOCH; fi
+      - (pip --version && pip install pip -U --no-cache-dir) && pip install wheel --no-cache-dir
+
+  build:
+    commands:
+      - python --version
+      - python setup.py sdist bdist_wheel
+      - BUILD_WHL=`find . -name "ecr_scan_reporter*.whl" -type f`
+      - echo $BUILD_WHL
+      - PY_BUILD=python/lib/python${PY_VERSION}/site-packages/
+      - mkdir -p ${PY_BUILD}
+      - pip install $BUILD_WHL --no-cache-dir -t ${PY_BUILD}
+      - find ${PY_BUILD} -type d -name "__pycache__" -exec rm -rf {} +
+      - zip -q -r9 layer-${SUFFIX}.zip python
+      - LAYER_FILE="layers/ecr_scan_reporter/layer-${SUFFIX}.zip"
+      - cp layer-${SUFFIX}.zip layer.zip
+      - |
+          aws --region eu-west-1 s3 cp layer-${SUFFIX}.zip s3://eu-west-1.${PUBLIC_FILES_BUCKET}/${LAYER_FILE} \
+            --sse AES256 --acl public-read --storage-class STANDARD_IA --no-progress;
+      - envsubst '$LAYER_FILE' < .install/layer-macro-sar.yaml > ecr-scan-reporter-sar.yaml
+      - |
+          aws s3 cp ecr-scan-reporter-sar.yaml s3://${PUBLIC_FILES_BUCKET}/aws-sar/ecr-scan-reporter.yaml \
+            --sse AES256 --acl public-read --storage-class STANDARD_IA
+  post_build:
+    commands:
+      - aws cloudformation package --template-file .install/layer_template.yaml --s3-bucket ${PUBLIC_FILES_BUCKET}  --output-template-file layer.template
+#      - aws cloudformation deploy --template-file layer.yml --stack-name ${DEPLOYMENT_NAME:-ecs-compose-x-layer} --capabilities CAPABILITY_AUTO_EXPAND --role-arn ${CFN_IAM_ROLE}
+
+artifacts:
+  files:
+    - layer.template
+    - ecr-scan-reporter-sar.yaml

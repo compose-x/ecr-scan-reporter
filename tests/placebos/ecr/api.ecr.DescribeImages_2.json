@@ -1,0 +1,546 @@
+{
+    "status_code": 200,
+    "data": {
+        "imageDetails": [
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:60b2c79f76279e8aa8b83813930efdfd73cfafa26e26cdb8e6e502ca34bae90b",
+                "imageTags": [
+                    "3.8.20210225-amd64"
+                ],
+                "imageSizeInBytes": 105239509,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 9,
+                    "minute": 15,
+                    "second": 17,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 2,
+                        "day": 25,
+                        "hour": 9,
+                        "minute": 15,
+                        "second": 20,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 2,
+                        "day": 24,
+                        "hour": 20,
+                        "minute": 28,
+                        "second": 12,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:866790758d05cd6b7862b48a86ea208b262092da9287d189592e5ad7456cb493",
+                "imageTags": [
+                    "3.8.20210715-arm64v8"
+                ],
+                "imageSizeInBytes": 85922574,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 22,
+                    "second": 41,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 7,
+                        "day": 15,
+                        "hour": 12,
+                        "minute": 22,
+                        "second": 46,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 7,
+                        "day": 13,
+                        "hour": 2,
+                        "minute": 41,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:848ced16cb98e5016e371b06587ac6f9183c0af373ba24fdd65e03fed19f64cc",
+                "imageTags": [
+                    "3.7.20210403-amd64"
+                ],
+                "imageSizeInBytes": 93626485,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 13,
+                    "second": 35,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 3,
+                        "hour": 10,
+                        "minute": 13,
+                        "second": 41,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 2,
+                        "hour": 16,
+                        "minute": 42,
+                        "second": 9,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:b044a157bd752dc58fffeab5a9bad8fbcefd4562b483521258c8975de0ae4603",
+                "imageTags": [
+                    "3.7.20210603-arm64v8"
+                ],
+                "imageSizeInBytes": 97525883,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 6,
+                    "day": 3,
+                    "hour": 8,
+                    "minute": 42,
+                    "second": 56,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 6,
+                        "day": 3,
+                        "hour": 8,
+                        "minute": 43,
+                        "second": 2,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 6,
+                        "day": 3,
+                        "hour": 2,
+                        "minute": 20,
+                        "second": 43,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:3275a465856172f597657aed2af6855c3780a3a1f7436e501256a9baca97b2e6",
+                "imageTags": [
+                    "3.8.20210430-amd64"
+                ],
+                "imageSizeInBytes": 94079784,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 30,
+                    "hour": 6,
+                    "minute": 51,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 30,
+                        "hour": 6,
+                        "minute": 51,
+                        "second": 45,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 21,
+                        "hour": 0,
+                        "minute": 7,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:62db7d2a8ae13b053c80425c119a4e4c7c80eeca623af563b050c7a279e80234",
+                "imageTags": [
+                    "3.8.20210715-amd64"
+                ],
+                "imageSizeInBytes": 84179262,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 21,
+                    "second": 6,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 7,
+                        "day": 15,
+                        "hour": 12,
+                        "minute": 21,
+                        "second": 13,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 7,
+                        "day": 13,
+                        "hour": 2,
+                        "minute": 41,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:86d48f7da580134430efe0d09d22ab17daee155fcfe52a760b9f8c8d00bb5daf",
+                "imageTags": [
+                    "3.8.20210513-arm64v8"
+                ],
+                "imageSizeInBytes": 96395817,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 8,
+                    "minute": 56,
+                    "second": 6,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 5,
+                        "day": 13,
+                        "hour": 8,
+                        "minute": 56,
+                        "second": 12,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 5,
+                        "day": 12,
+                        "hour": 18,
+                        "minute": 13,
+                        "second": 30,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:83e7181fbe66519dbfeb20637e6bf22c000000000000cc02f2d5556616790c78",
+                "imageTags": [
+                    "3.8.20210225-arm64v8"
+                ],
+                "imageSizeInBytes": 107642043,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 9,
+                    "minute": 16,
+                    "second": 6,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 2,
+                        "day": 25,
+                        "hour": 9,
+                        "minute": 16,
+                        "second": 9,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 2,
+                        "day": 24,
+                        "hour": 20,
+                        "minute": 28,
+                        "second": 12,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:7200c319732eb7479941f31bb5cc9501b1bbdf9e32b1eff1ab9624c0e4802b83",
+                "imageTags": [
+                    "3.8.20210403-amd64"
+                ],
+                "imageSizeInBytes": 93910174,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 13,
+                    "second": 38,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 3,
+                        "hour": 10,
+                        "minute": 13,
+                        "second": 44,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 2,
+                        "hour": 16,
+                        "minute": 42,
+                        "second": 9,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:f2a9ccdeee135d2c6198a65feb1a2c3fbbbeeb0febf777e0d7d6979ee24af104",
+                "imageTags": [
+                    "3.7.20210310-amd64"
+                ],
+                "imageSizeInBytes": 83647301,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 23,
+                    "minute": 25,
+                    "second": 18,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 3,
+                        "day": 10,
+                        "hour": 23,
+                        "minute": 25,
+                        "second": 21,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 3,
+                        "day": 10,
+                        "hour": 16,
+                        "minute": 32,
+                        "second": 26,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            },
+            {
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "imageDigest": "sha256:7bac564780779cf03e17ab958bb01e41e654c54d2c51c7c536f000000000000d",
+                "imageTags": [
+                    "3.7.20210403-arm64v8"
+                ],
+                "imageSizeInBytes": 95953002,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 17,
+                    "second": 59,
+                    "microsecond": 0
+                },
+                "imageScanStatus": {
+                    "status": "COMPLETE",
+                    "description": "The scan was completed successfully."
+                },
+                "imageScanFindingsSummary": {
+                    "imageScanCompletedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 3,
+                        "hour": 10,
+                        "minute": 18,
+                        "second": 5,
+                        "microsecond": 0
+                    },
+                    "vulnerabilitySourceUpdatedAt": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 4,
+                        "day": 2,
+                        "hour": 16,
+                        "minute": 42,
+                        "second": 9,
+                        "microsecond": 0
+                    },
+                    "findingSeverityCounts": {}
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "d59d3bef-4577-409f-bc4f-33ca0412847b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d59d3bef-4577-409f-bc4f-33ca0412847b",
+                "date": "Wed, 21 Jul 2021 12:04:20 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "6810"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

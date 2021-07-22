@@ -1,0 +1,299 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  Template to deploy the Lambda functions and required resources for triggering
+
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  NotificationEmail:
+    Type: String
+    Default: none
+
+  PermissionsBoundary:
+    Type: String
+    Default: none
+
+  LambdaLayerVersionArn:
+    Type: String
+    Default: none
+
+  ScanRate:
+    Type: String
+    Default: 1 day
+
+Conditions:
+  EmailNotificationCon: !Not [!Equals [!Ref NotificationEmail, "none"]]
+  PermissionsBoundaryCon: !Not [!Equals [!Ref PermissionsBoundary, "none"]]
+  OverrideLayerVersion: !Not [!Equals [!Ref LambdaLayerVersionArn, "none"]]
+
+
+Resources:
+  NotificationsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub 'ecrScanReports-${AWS::StackName}'
+      Tags:
+        - Key: Description
+          Value: SNS Topic for Images scanning reports
+
+  MailNofitication:
+    Type: AWS::SNS::Subscription
+    DependsOn:
+      - NotificationsTopic
+    Condition: EmailNotificationCon
+    Properties:
+      Endpoint: !Ref NotificationEmail
+      Protocol: email
+      TopicArn: !Ref NotificationsTopic
+
+  JobsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      Tags:
+        - Key: Description
+          Value: SQS Queues for Images scanning distribution
+
+  MacroLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+      ContentUri: s3://eu-west-1.files.compose-x.io/${LAYER_FILE}
+      Description: ECR Scans Repoter
+      LayerName: ecr_scan_reporter
+      LicenseInfo: MPL-2.0
+
+  ecrAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - !Ref imagesScannerFunctionRole
+        - !Ref repositoriesScannerFunctionRole
+      PolicyName: ecrAccessPolicyForScanReporter
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ECRListAll
+            Effect: Allow
+            Action:
+              - ecr:DescribeRepositories
+              - ecr:DescribeImages
+              - ecr:ListImages
+              - ecr:DescribeImageScanFindings
+            Resource:
+              - !Sub "arn:${AWS::Partition}:ecr:*:${AWS::AccountId}:repository/*"
+          - Sid: ECRStartScan
+            Effect: Allow
+            Action:
+              - ecr:StartImageScan
+            Resource:
+              - !Sub "arn:${AWS::Partition}:ecr:*:${AWS::AccountId}:repository/*"
+
+  reporterFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Condition:
+              Bool:
+                aws:SecureTransport: 'true'
+            Effect: Allow
+            Principal:
+              Service:
+                - !Sub 'lambda.${AWS::URLSuffix}'
+        Version: '2012-10-17'
+      Description: !Sub 'reporterFunctionRole-${AWS::StackName}'
+      PermissionsBoundary: !If
+        - PermissionsBoundaryCon
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      Policies:
+        - PolicyName: snsPublish
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: SNSAccess
+                Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Ref NotificationsTopic
+
+  reporterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Timeout: 10
+      Role: !GetAtt reporterFunctionRole.Arn
+      Layers:
+        - Fn::If:
+            - OverrideLayerVersion
+            - !Ref LambdaLayerVersionArn
+            - !Ref MacroLambdaLayer
+
+      Events:
+        OnEcrEvent:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: !Ref AWS::NoValue
+            Pattern:
+              source:
+                - aws.ecr
+              detail-type:
+                - "ECR Image Scan"
+              detail:
+                scan-status:
+                  - COMPLETE
+      InlineCode: |
+        #!/usr/bin/env python
+        from ecr_scan_reporter.lambda_functions import findings_handler
+
+
+        def lambda_handler(event, context):
+            """ Entry point function """
+            return findings_handler(event, context)
+
+
+  imagesScannerFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Condition:
+              Bool:
+                aws:SecureTransport: 'true'
+            Effect: Allow
+            Principal:
+              Service:
+                - !Sub 'lambda.${AWS::URLSuffix}'
+        Version: '2012-10-17'
+      Description: !Sub 'reporterFunctionRole-${AWS::StackName}'
+      PermissionsBoundary: !If
+        - PermissionsBoundaryCon
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      Policies:
+        - PolicyName: sqsAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: AccessSQS
+                Action: [
+                  "sqs:ChangeMessageVisibility",
+                  "sqs:ChangeMessageVisibilityBatch",
+                  "sqs:DeleteMessage",
+                  "sqs:DeleteMessageBatch",
+                  "sqs:GetQueueAttributes",
+                  "sqs:ReceiveMessage"
+                  ]
+                Effect: Allow
+                Resource:
+                  - !GetAtt JobsQueue.Arn
+
+  imagesScannerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Timeout: 30
+      Role: !GetAtt imagesScannerFunctionRole.Arn
+      Layers:
+        - Fn::If:
+            - OverrideLayerVersion
+            - !Ref LambdaLayerVersionArn
+            - !Ref MacroLambdaLayer
+
+      Events:
+        SqsInvoke:
+          Type: SQS
+          Properties:
+            BatchSize: 10
+            Enabled: true
+            MaximumBatchingWindowInSeconds: 30
+            Queue: !GetAtt JobsQueue.Arn
+
+      InlineCode: |
+        #!/usr/bin/env python
+        from ecr_scan_reporter.lambda_functions import repo_images_scanning_handler
+
+
+        def lambda_handler(event, context):
+            """ Entry point function """
+            return repo_images_scanning_handler(event, context)
+
+  repositoriesScannerFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Condition:
+              Bool:
+                aws:SecureTransport: 'true'
+            Effect: Allow
+            Principal:
+              Service:
+                - !Sub 'lambda.${AWS::URLSuffix}'
+        Version: '2012-10-17'
+      Description: !Sub 'reporterFunctionRole-${AWS::StackName}'
+      PermissionsBoundary: !If
+        - PermissionsBoundaryCon
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+      Policies:
+        - PolicyName: sqsAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: AccessSQS
+                Action:
+                  - "sqs:SendMessage*"
+                Effect: Allow
+                Resource:
+                  - !GetAtt JobsQueue.Arn
+
+  repositoriesScannerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Role: !GetAtt repositoriesScannerFunctionRole.Arn
+      Timeout: 30
+      Environment:
+        Variables:
+          IMAGES_SCAN_JOBS_QUEUE_URL: !Ref JobsQueue
+      Layers:
+        - Fn::If:
+            - OverrideLayerVersion
+            - !Ref LambdaLayerVersionArn
+            - !Ref MacroLambdaLayer
+
+      Events:
+        OnSchedule:
+          Type: Schedule
+          Properties:
+            Description: "CronJob for ECR Scans"
+            Enabled: true
+            Schedule: !Sub "rate(${ScanRate})"
+
+      InlineCode: |
+        #!/usr/bin/env python
+        from ecr_scan_reporter.lambda_functions import scans_job_handler
+
+
+        def lambda_handler(event, context):
+            """ Entry point function """
+            return scans_job_handler(event, context)

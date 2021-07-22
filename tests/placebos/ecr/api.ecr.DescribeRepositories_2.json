@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:eu-west-1:000000000000:repository/amazoncorretto",
+                "registryId": "000000000000",
+                "repositoryName": "amazoncorretto",
+                "repositoryUri": "000000000000.dkr.ecr.eu-west-1.amazonaws.com/amazoncorretto",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 17,
+                    "hour": 7,
+                    "minute": 27,
+                    "second": 16,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "MUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": true
+                },
+                "encryptionConfiguration": {
+                    "encryptionType": "AES256"
+                }
+            },
+            {
+                "repositoryArn": "arn:aws:ecr:eu-west-1:000000000000:repository/python",
+                "registryId": "000000000000",
+                "repositoryName": "python",
+                "repositoryUri": "000000000000.dkr.ecr.eu-west-1.amazonaws.com/python",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 8,
+                    "minute": 45,
+                    "second": 39,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "MUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": true
+                },
+                "encryptionConfiguration": {
+                    "encryptionType": "AES256"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "d2c30510-c9b1-4374-9f29-52056779cd4e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d2c30510-c9b1-4374-9f29-52056779cd4e",
+                "date": "Wed, 21 Jul 2021 12:02:43 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "756"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,34 @@
+---
+# Template for lambda layer publish
+
+AWSTemplateFormatVersion: "2010-09-09"
+Transform:
+  - AWS::Serverless-2016-10-31
+Description: >-
+  Template to deploy Lambda Layer version
+Resources:
+  LambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+      ContentUri: ../layer.zip
+      Description: ECS Compose-X Lambda Layer
+      LayerName: ecs_composex
+      LicenseInfo: MPL-2.0
+      RetentionPolicy: Retain
+
+  LayerPermissions:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::LayerVersionPermission
+    Properties:
+      Action: lambda:GetLayerVersion
+      LayerVersionArn: !Ref LambdaLayer
+      OrganizationId: !Ref AWS::NoValue
+      Principal: "*"
+
+
+Outputs:
+  LayerVersion:
+    Value: !Ref LambdaLayer
