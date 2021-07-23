@@ -38,7 +38,7 @@ clean-build: ## remove build artifacts
 clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
+	find . -name '*~' -exec rm -rf {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test: ## remove test and coverage artifacts
@@ -69,6 +69,11 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
+
+publish-docs: docs
+	cd docs/_build/html && \
+	$(AWS) s3 sync . s3://${DOCS_BUCKET}/ \
+	--acl public-read --sse AES256 --storage-class ONEZONE_IA
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .

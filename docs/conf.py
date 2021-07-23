@@ -125,7 +125,7 @@ html_theme_options = {
     "color_primary": "blue",
     "color_accent": "light-blue",
     # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/compose-x/ecr_scan_reporter/",
+    "repo_url": "https://github.com/compose-x/ecr-scan-reporter/",
     "repo_name": "compose-x/ecr_scan_reporter",
     "repo_type": "github",
     # Visible levels of the global TOC; -1 means unlimited
