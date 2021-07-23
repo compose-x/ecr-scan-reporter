@@ -100,7 +100,7 @@ autosummary_generate = True
 autoclass_content = "class"
 
 sitemap_locales = ["en"]
-html_baseurl = "https://docs"
+html_baseurl = "https://ecr-scan-reporter.compose-x.io/"
 
 extensions.append("sphinx_material")
 html_theme_path = sphinx_material.html_theme_path()
@@ -117,7 +117,7 @@ html_theme_options = {
     # 'google_analytics_account': 'UA-XXXXX',
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
-    "base_url": "https://docs",
+    "base_url": "https://ecr-scan-reporter.compose-x.io/",
     "html_minify": False,
     "html_prettify": True,
     "css_minify": True,
@@ -125,8 +125,8 @@ html_theme_options = {
     "color_primary": "blue",
     "color_accent": "light-blue",
     # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/compose-x/ecr_scan_reporter/",
-    "repo_name": "compose-x/ecr_scan_reporter",
+    "repo_url": "https://github.com/compose-x/ecr-scan-reporter/",
+    "repo_name": "compose-x/ecr-scan-reporter",
     "repo_type": "github",
     # Visible levels of the global TOC; -1 means unlimited
     "globaltoc_depth": 2,

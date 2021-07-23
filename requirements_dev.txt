@@ -9,7 +9,7 @@ behave==1.2.6
 Sphinx==4.1.0
 twine==3.4.2
 sphinx-sitemap==2.2.0
-sphinx-material==0.0.32
+sphinx-material==0.0.34
 black==21.6b0
 pre-commit==2.9.3
 bump2version==1.0.1

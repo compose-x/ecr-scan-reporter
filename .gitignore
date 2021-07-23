@@ -106,5 +106,8 @@ ENV/
 
 # IDE settings
 .vscode/
+
+# Project files
 *portal.sso.GetRoleCredentials*.json
 codebuild_build.sh
+docs/ecr_scan_reporter.rst
