@@ -105,5 +105,27 @@ The events are captured directly from EventsBridge, meaning that it will run com
 If you created your ECR repositories with scanOnPush set to true, which triggers a scan each new push, that will allow
 you to get the notification moments after image build without having to go to the ECR console to check.
 
+Configuration
+----------------
+
+ECR_SNS_REPORT_TOPIC_ARN
+++++++++++++++++++++++++++++
+
+This environment variable must be set to allow the Lambda function to send messages to it.
+
+Logic
+------
+
+Trigger
++++++++++
+
+This function is completely decoupled, as described above, from the other two. It gets triggered whenever a Scan
+is complete.
+
+Messages content
++++++++++++++++++
+
+The messages published to SNS contain the same message for all media (to date) but is already in place to allow
+in the future to allow for more enriched content for capable medias.
 
 .. _AWS EventsBridge Rate Expressions: https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html#eb-rate-expressions

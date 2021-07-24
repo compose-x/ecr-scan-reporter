@@ -19,7 +19,9 @@ from pytz import utc
 
 from ecr_scan_reporter.common import chunked_iterable
 
-DURATIONS_RE = re.compile(r"(?P<months>\dm)?(?P<weeks>\dw)?(?P<days>\dd)?")
+DURATIONS_RE = re.compile(
+    r"(?P<months>\dm)?(?P<weeks>\dw)?(?P<days>\dd)?(?P<hours>\dh)?"
+)
 DEFAULT_DURATION = "7d"
 NOW = dt.utcnow()
 
@@ -43,6 +45,11 @@ def get_duration(duration_exp=None, env_key=None):
             f"The provided duration, {duration_exp}, does not match expected regexp "
             f"{DURATIONS_RE.pattern}. Using default of 7days"
         )
+    hours = (
+        int(re.sub(r"[^\d]", "", DURATIONS_RE.match(duration_exp).group("hours")))
+        if DURATIONS_RE.match(duration_exp).group("hours")
+        else 0
+    )
     days = (
         int(re.sub(r"[^\d]", "", DURATIONS_RE.match(duration_exp).group("days")))
         if DURATIONS_RE.match(duration_exp).group("days")
@@ -58,7 +65,7 @@ def get_duration(duration_exp=None, env_key=None):
         if DURATIONS_RE.match(duration_exp).group("months")
         else 0
     )
-    up_to = NOW - relativedelta(months=months, weeks=weeks, days=days)
+    up_to = NOW - relativedelta(months=months, weeks=weeks, days=days, hours=hours)
     return up_to
 
 

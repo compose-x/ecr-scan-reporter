@@ -2,28 +2,67 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description:
   Template to deploy the Lambda functions and required resources for triggering
 
-Transform: AWS::Serverless-2016-10-31
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Metadata:
+  Maintainer: john@compose-x.io
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Parameters:
+          - ScanRate
+          - ScanExpiryDuration
+          - NotifyOnScanFailure
+          - NotificationEmail
+        Label:
+          default: ECR Scan Settings.
+      - Parameters:
+          - LambdaLayerVersionArn
+        Label:
+          default: Lambda Settings
+      - Parameters:
+          - PermissionsBoundary
+        Label:
+          default: IAM Settings
 Parameters:
   NotificationEmail:
     Type: String
     Default: none
+    Description: Mail address to send notifications to. Optional.
 
   PermissionsBoundary:
     Type: String
     Default: none
+    Description: IAM Policy ARN to use for PermissionsBoundary if required. Optional.
 
   LambdaLayerVersionArn:
     Type: String
     Default: none
+    Description: Whether you want to use a different lambda layer for the Functions. Optional. Not recommended.
 
   ScanRate:
     Type: String
     Default: 1 day
+    Description: The rate at which EventsBridge will trigger the scans.
+
+  ScanExpiryDuration:
+    Type: String
+    Default: 7d
+    Description: Defines which images to scan based on last scan date.
+
+  NotifyOnScanFailure:
+    Type: String
+    Description: Whether or not you receive notifications if the scan failed.
+    Default: "True"
+    AllowedValues:
+      - "True"
+      - "False"
 
 Conditions:
   EmailNotificationCon: !Not [!Equals [!Ref NotificationEmail, "none"]]
   PermissionsBoundaryCon: !Not [!Equals [!Ref PermissionsBoundary, "none"]]
   OverrideLayerVersion: !Not [!Equals [!Ref LambdaLayerVersionArn, "none"]]
+  NotNotifyOnScanFailureCon: !Equals [!Ref NotifyOnScanFailure, "False"]
 
 
 Resources:
@@ -53,6 +92,12 @@ Resources:
           Value: SQS Queues for Images scanning distribution
 
   MacroLambdaLayer:
+    DependsOn:
+      - reporterFunctionRole
+      - repositoriesScannerFunctionRole
+      - imagesScannerFunctionRole
+      - NotificationsTopic
+      - JobsQueue
     Type: AWS::Serverless::LayerVersion
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -136,7 +181,9 @@ Resources:
             - OverrideLayerVersion
             - !Ref LambdaLayerVersionArn
             - !Ref MacroLambdaLayer
-
+      Environment:
+        Variables:
+          ECR_SNS_REPORT_TOPIC_ARN: !Ref NotificationsTopic
       Events:
         OnEcrEvent:
           Type: EventBridgeRule
@@ -150,6 +197,7 @@ Resources:
               detail:
                 scan-status:
                   - COMPLETE
+                  - !If [NotNotifyOnScanFailureCon, !Ref AWS::NoValue, "FAILED"]
       InlineCode: |
         #!/usr/bin/env python
         from ecr_scan_reporter.lambda_functions import findings_handler
@@ -212,7 +260,9 @@ Resources:
             - OverrideLayerVersion
             - !Ref LambdaLayerVersionArn
             - !Ref MacroLambdaLayer
-
+      Environment:
+        Variables:
+          ECR_IMAGES_DURATION_DELTA: !Ref ScanExpiryDuration
       Events:
         SqsInvoke:
           Type: SQS

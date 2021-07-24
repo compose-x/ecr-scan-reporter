@@ -33,8 +33,6 @@ def findings_handler(event, context):
     report = parse_scan_report(event, thresholds)
     if not report:
         return
-    if not environ.get("ECR_SNS_REPORT_TOPIC_ARN", None):
-        return
     l_session = session.Session()
     sns = l_session.client("sns")
     repository_name = event["detail"]["repository-name"]
@@ -48,6 +46,8 @@ def findings_handler(event, context):
         "http": f"Vulnerabilities found above threshold for {repository_name} {reason}",
         "https": f"Vulnerabilities found above threshold for {repository_name} {reason}",
     }
+    if not environ.get("ECR_SNS_REPORT_TOPIC_ARN", None):
+        return
     res = sns.publish(
         TopicArn=environ.get("ECR_SNS_REPORT_TOPIC_ARN", None),
         Message=dumps(message_json, ensure_ascii=True),
