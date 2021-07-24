@@ -16,7 +16,10 @@ Workflow
 
 .. image:: https://ecr-scan-reporter.compose-x.io/_images/EcrScanReporterWorkflow.jpg
 
+
 Full documentation https://ecr-scan-reporter.compose-x.io.
+
+Install from `AWS Serveless Applications Repository`_
 
 Credits
 -------
@@ -24,3 +27,4 @@ Credits
 This package was created with Cookiecutter_.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _AWS Serveless Applications Repository: https://serverlessrepo.aws.amazon.com/applications/eu-west-1/518078317392/ecr-scan-reporter
