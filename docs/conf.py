@@ -91,11 +91,10 @@ extensions += [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
-    "sphinx_sitemap",
+    # "sphinx_sitemap",
 ]
 
 sitemap_locales = ["en"]
-html_theme = "sphinx_rtd_theme"
 autosummary_generate = True
 autoclass_content = "class"
 
@@ -141,9 +140,7 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_show_sourcelink = True
-html_sidebars = {
-    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
-}
+html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------
 
@@ -185,9 +182,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, "ecr_scan_reporter", "ECR Scan Reporter Documentation", [author], 1)
-]
+man_pages = [(master_doc, "ecr_scan_reporter", "ECR Scan Reporter Documentation", [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------
 
