@@ -100,5 +100,4 @@ def job_dispatcher(queue_url, repos, sqs_session=None):
         entries = []
         for repo in chunk:
             entries.append({"Id": str(uuid.uuid4()), "MessageBody": repo})
-        print(entries)
         client.send_message_batch(QueueUrl=queue_url, Entries=entries)

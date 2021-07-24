@@ -38,11 +38,15 @@ def findings_handler(event, context):
     l_session = session.Session()
     sns = l_session.client("sns")
     repository_name = event["detail"]["repository-name"]
+    if "reason" in report[0].keys() and report[0]["reason"]:
+        reason = report[0]["reason"]
+    else:
+        reason = "Issue detected with the scan and or / findings."
     message_json = {
-        "default": f"Vulnerabilities found above threshold for {repository_name}",
-        "email": f"Vulnerabilities found above threshold for {repository_name}",
-        "http": f"Vulnerabilities found above threshold for {repository_name}",
-        "https": f"Vulnerabilities found above threshold for {repository_name}",
+        "default": f"Vulnerabilities found above threshold for {repository_name} {reason}",
+        "email": f"Vulnerabilities found above threshold for {repository_name} {reason}",
+        "http": f"Vulnerabilities found above threshold for {repository_name} {reason}",
+        "https": f"Vulnerabilities found above threshold for {repository_name} {reason}",
     }
     res = sns.publish(
         TopicArn=environ.get("ECR_SNS_REPORT_TOPIC_ARN", None),

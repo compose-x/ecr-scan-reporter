@@ -14,7 +14,7 @@ Serverless Application to monitor ECR Repositories and capture scan results
 Workflow
 ==========
 
-.. image:: EcrScanReporterWorkflow.jpg
+.. image:: https://ecr-scan-reporter.compose-x.io/_images/EcrScanReporterWorkflow.jpg
 
 Full documentation https://ecr-scan-reporter.compose-x.io.
 

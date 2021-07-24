@@ -174,7 +174,7 @@ def define_images_to_scan(images, duration_override=None, duration_env_key=None)
         ):
             checkpoint = image[scan_source]
         if checkpoint < delta:
-            print(f"Adding image due to {scan_source}", image[scan_source])
+            # print(f"Adding image due to {scan_source}", image[scan_source])
             images_to_scan.append(image)
     return images_to_scan
 

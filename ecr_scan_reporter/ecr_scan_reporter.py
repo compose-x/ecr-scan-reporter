@@ -29,18 +29,27 @@ def parse_scan_report(event, thresholds):
     :return:
     """
     scan_details = event["detail"]
-    if (
-        "scan-status" not in scan_details.keys()
-        or scan_details["scan-status"] == "COMPLETE"
-    ):
+    if "scan-status" not in scan_details.keys():
+        print("NO SCAN STATUS GIVEN??", event)
         return
-    if (
-        "finding-severity-counts" not in scan_details.keys()
-        or not scan_details["finding-severity-counts"]
+    elif (
+        "scan-status" in scan_details.keys() and scan_details["scan-status"] == "FAILED"
     ):
-        return
-    findings = scan_details["finding-severity-counts"]
-    for level, threshold in thresholds.items():
-        if level in findings.keys() and findings[level] >= threshold:
-            return findings
+        print("Scan failed", event)
+        return {"reason": "Failed to scan the image"}
+    elif (
+        "scan-status" in scan_details.keys()
+        and scan_details["scan-status"] == "COMPLETE"
+    ):
+        if (
+            "finding-severity-counts" not in scan_details.keys()
+            or not scan_details["finding-severity-counts"]
+        ):
+            return
+        else:
+            findings = scan_details["finding-severity-counts"]
+            for level, threshold in thresholds.items():
+                if level in findings.keys() and findings[level] >= threshold:
+                    findings["reason"] = "Findings above defined thresholds"
+                    return findings, thresholds
     return
