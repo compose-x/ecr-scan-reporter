@@ -24,6 +24,14 @@ Metadata:
           - PermissionsBoundary
         Label:
           default: IAM Settings
+      - Parameters:
+          - CriticalThreshold
+          - HighThreshold
+          - MediumlThreshold
+          - LowThreshold
+        Label:
+          default: Scan Vulnerabilities Threshold report.
+
 Parameters:
   NotificationEmail:
     Type: String
@@ -57,6 +65,26 @@ Parameters:
     AllowedValues:
       - "True"
       - "False"
+
+  CriticalThreshold:
+    Type: Number
+    MinValue: 0
+    Default: 0
+
+  HighThreshold:
+    Type: Number
+    MinValue: 0
+    Default: 0
+
+  MediumlThreshold:
+    Type: Number
+    MinValue: 0
+    Default: 0
+
+  LowThreshold:
+    Type: Number
+    MinValue: 0
+    Default: 0
 
 Conditions:
   EmailNotificationCon: !Not [!Equals [!Ref NotificationEmail, "none"]]
@@ -184,6 +212,10 @@ Resources:
       Environment:
         Variables:
           ECR_SNS_REPORT_TOPIC_ARN: !Ref NotificationsTopic
+          CRITICAL: !Ref CriticalThreshold
+          HIGH: !Ref HighThreshold
+          MEDIUM: !Ref MediumlThreshold
+          LOW: !Ref LowThreshold
       Events:
         OnEcrEvent:
           Type: EventBridgeRule

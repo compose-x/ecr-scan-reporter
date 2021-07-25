@@ -13,10 +13,10 @@ def import_thresholds():
     :return:
     """
     thresholds = {
-        "CRITICAL": environ.get("CRITICAL", DEFAULT_THRESHOLDS["CRITICAL"]),
-        "HIGH": environ.get("HIGH", DEFAULT_THRESHOLDS["HIGH"]),
-        "MEDIUM": environ.get("MEDIUM", DEFAULT_THRESHOLDS["MEDIUM"]),
-        "LOW": environ.get("LOW", DEFAULT_THRESHOLDS["LOW"]),
+        "CRITICAL": int(environ.get("CRITICAL", DEFAULT_THRESHOLDS["CRITICAL"])),
+        "HIGH": int(environ.get("HIGH", DEFAULT_THRESHOLDS["HIGH"])),
+        "MEDIUM": int(environ.get("MEDIUM", DEFAULT_THRESHOLDS["MEDIUM"])),
+        "LOW": int(environ.get("LOW", DEFAULT_THRESHOLDS["LOW"])),
     }
     return thresholds
 
@@ -32,19 +32,11 @@ def parse_scan_report(event, thresholds):
     if "scan-status" not in scan_details.keys():
         print("NO SCAN STATUS GIVEN??", event)
         return
-    elif (
-        "scan-status" in scan_details.keys() and scan_details["scan-status"] == "FAILED"
-    ):
+    elif "scan-status" in scan_details.keys() and scan_details["scan-status"] == "FAILED":
         print("Scan failed", event)
         return {"reason": "Failed to scan the image"}
-    elif (
-        "scan-status" in scan_details.keys()
-        and scan_details["scan-status"] == "COMPLETE"
-    ):
-        if (
-            "finding-severity-counts" not in scan_details.keys()
-            or not scan_details["finding-severity-counts"]
-        ):
+    elif "scan-status" in scan_details.keys() and scan_details["scan-status"] == "COMPLETE":
+        if "finding-severity-counts" not in scan_details.keys() or not scan_details["finding-severity-counts"]:
             return
         else:
             findings = scan_details["finding-severity-counts"]
@@ -52,4 +44,3 @@ def parse_scan_report(event, thresholds):
                 if level in findings.keys() and findings[level] >= threshold:
                     findings["reason"] = "Findings above defined thresholds"
                     return findings, thresholds
-    return

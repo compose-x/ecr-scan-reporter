@@ -113,6 +113,13 @@ ECR_SNS_REPORT_TOPIC_ARN
 
 This environment variable must be set to allow the Lambda function to send messages to it.
 
+Thresholds
++++++++++++
+
+By default all 4 thresholds (CRITICAL, HIGH, MEDIUM and LOW) have a threshold value of 0.
+If you want to adapt the threshold value for each of these levels, simply set an environment variable with the name
+of each level, and set the value.
+
 Logic
 ------
 
@@ -127,5 +134,6 @@ Messages content
 
 The messages published to SNS contain the same message for all media (to date) but is already in place to allow
 in the future to allow for more enriched content for capable medias.
+
 
 .. _AWS EventsBridge Rate Expressions: https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html#eb-rate-expressions
