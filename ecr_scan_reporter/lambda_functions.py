@@ -29,7 +29,9 @@ def format_mail_message(reason, report):
     levels = [reason]
     thresholds = report[1]
     findings = report[0]
-    for level, value in thresholds.values():
+    print(thresholds, type(thresholds), thresholds.items())
+    print(findings, type(findings))
+    for level, value in thresholds.items():
         if level in findings.keys():
             levels.append(f"{level}: {findings[level]}/{value}\n")
     return "\n".join(levels)
@@ -54,12 +56,16 @@ def findings_handler(event, context):
         reason = report[0]["reason"]
     else:
         reason = "Issue detected with the scan and or / findings."
+    image_id = report[2]
+    if report[3]:
+        image_id = ",".join(report[3])
     message_json = {
-        "default": f"Vulnerabilities found above threshold for {repository_name} {reason}",
-        "email": f"Vulnerabilities found above threshold for {repository_name}\n{format_mail_message(reason, report)}",
-        "http": f"Vulnerabilities found above threshold for {repository_name} {reason}",
-        "https": f"Vulnerabilities found above threshold for {repository_name} {reason}",
+        "default": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
+        "email": f"Vulnerabilities found above threshold for {repository_name}@{image_id}\n{format_mail_message(reason, report)}",
+        "http": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
+        "https": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
     }
+    print(message_json)
     if not environ.get("ECR_SNS_REPORT_TOPIC_ARN", None):
         return
     res = sns.publish(

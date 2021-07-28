@@ -100,3 +100,10 @@ def test_with_failed(with_failed_scan):
     """
     thresholds = import_thresholds()
     findings = parse_scan_report(with_failed_scan, thresholds)
+
+
+def test_reporter_function():
+    """
+    Function to test the message formatting
+    :return:
+    """
