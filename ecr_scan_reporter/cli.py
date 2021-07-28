@@ -12,12 +12,8 @@ from ecr_scan_reporter.repos_scanner import filter_repos_from_regexp, list_ecr_r
 def main():
     """Console script for ecr_scan_reporter."""
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--profile", help="AWS Profile name to use for API Calls", required=False
-    )
-    parser.add_argument(
-        "--region", help="AWS Region to scan ECR Repos for", required=False
-    )
+    parser.add_argument("--profile", help="AWS Profile name to use for API Calls", required=False)
+    parser.add_argument("--region", help="AWS Region to scan ECR Repos for", required=False)
     parser.add_argument(
         "--repos-regex",
         help="Regular expression to filter repositories names",
@@ -40,9 +36,7 @@ def main():
     args = parser.parse_args()
 
     if args.profile and args.region:
-        cli_session = session.Session(
-            profile_name=args.profile, region_name=args.region
-        )
+        cli_session = session.Session(profile_name=args.profile, region_name=args.region)
     elif args.profile and not args.region:
         cli_session = session.Session(profile_name=args.profile)
     elif not args.profile and args.region:
@@ -52,9 +46,7 @@ def main():
 
     print("Arguments: " + str(args._))
     account_region_repos = list_ecr_repos(ecr_session=cli_session)
-    filtered_repos = filter_repos_from_regexp(
-        account_region_repos, repos_names_filter=args.repos_regex
-    )
+    filtered_repos = filter_repos_from_regexp(account_region_repos, repos_names_filter=args.repos_regex)
     print("Repos found with provided parameters", filtered_repos)
     for repo in filtered_repos:
         print(f"Analyzing images of {repo}")

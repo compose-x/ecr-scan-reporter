@@ -39,9 +39,7 @@ def list_ecr_repos(repos=None, next_token=None, ecr_session=None):
         res = client.describe_repositories(nextToken=next_token)
     repos += res["repositories"]
     if "nextToken" in res and res["nextToken"]:
-        return list_ecr_repos(
-            repos=repos, next_token=res["nextToken"], ecr_session=ecr_session
-        )
+        return list_ecr_repos(repos=repos, next_token=res["nextToken"], ecr_session=ecr_session)
     return repos
 
 
@@ -66,9 +64,7 @@ def filter_repos_from_regexp(repos_list, repos_names_filter=None):
         elif isinstance(repo, str):
             repo_name = repo
         else:
-            raise TypeError(
-                "The repo list must be a list of dicts or str. Got", type(repo)
-            )
+            raise TypeError("The repo list must be a list of dicts or str. Got", type(repo))
         if repos_filter.match(repo_name):
             filtered_repos.append(repo_name)
     return filtered_repos

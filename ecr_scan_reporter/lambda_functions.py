@@ -14,11 +14,27 @@ from boto3 import session
 
 from ecr_scan_reporter.ecr_scan_reporter import import_thresholds, parse_scan_report
 from ecr_scan_reporter.images_scanner import scan_repo_images
-from ecr_scan_reporter.repos_scanner import (
-    filter_repos_from_regexp,
-    job_dispatcher,
-    list_ecr_repos,
-)
+from ecr_scan_reporter.repos_scanner import filter_repos_from_regexp, job_dispatcher, list_ecr_repos
+
+
+def format_mail_message(reason, report):
+    """
+    Function to format a nice mail message with the breakdown of findings and thresholds
+
+    :param str reason:
+    :param tuple report:
+    :return: The mail string
+    :rtype: str
+    """
+    levels = [reason]
+    thresholds = report[1]
+    findings = report[0]
+    print(thresholds, type(thresholds), thresholds.items())
+    print(findings, type(findings))
+    for level, value in thresholds.items():
+        if level in findings.keys():
+            levels.append(f"{level}: {findings[level]}/{value}\n")
+    return "\n".join(levels)
 
 
 def findings_handler(event, context):
@@ -40,12 +56,16 @@ def findings_handler(event, context):
         reason = report[0]["reason"]
     else:
         reason = "Issue detected with the scan and or / findings."
+    image_id = report[2]
+    if report[3]:
+        image_id = ",".join(report[3])
     message_json = {
-        "default": f"Vulnerabilities found above threshold for {repository_name} {reason}",
-        "email": f"Vulnerabilities found above threshold for {repository_name} {reason}",
-        "http": f"Vulnerabilities found above threshold for {repository_name} {reason}",
-        "https": f"Vulnerabilities found above threshold for {repository_name} {reason}",
+        "default": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
+        "email": f"Vulnerabilities found above threshold for {repository_name}@{image_id}\n{format_mail_message(reason, report)}",
+        "http": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
+        "https": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
     }
+    print(message_json)
     if not environ.get("ECR_SNS_REPORT_TOPIC_ARN", None):
         return
     res = sns.publish(
@@ -74,20 +94,12 @@ def scans_job_handler(event, context):
     ):
         regexp_override = event["repositoriesFilterRegexp"]
     repos_list = list_ecr_repos(ecr_session=lambda_session)
-    filtered_repos_list = filter_repos_from_regexp(
-        repos_list, repos_names_filter=regexp_override
-    )
+    filtered_repos_list = filter_repos_from_regexp(repos_list, repos_names_filter=regexp_override)
     queue_url = environ.get("IMAGES_SCAN_JOBS_QUEUE_URL", None)
-    if (
-        "jobsQueueUrl" in event.keys()
-        and event["jobsQueueUrl"]
-        and isinstance(event["jobsQueueUrl"], str)
-    ):
+    if "jobsQueueUrl" in event.keys() and event["jobsQueueUrl"] and isinstance(event["jobsQueueUrl"], str):
         queue_url = event["jobsQueueUrl"]
     if queue_url is None:
-        warnings.warn(
-            "No QueueURL was provided. Attempting to complete task locally. Might run out of time"
-        )
+        warnings.warn("No QueueURL was provided. Attempting to complete task locally. Might run out of time")
     else:
         job_dispatcher(queue_url, filtered_repos_list, lambda_session)
 

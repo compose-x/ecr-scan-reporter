@@ -19,9 +19,7 @@ from pytz import utc
 
 from ecr_scan_reporter.common import chunked_iterable
 
-DURATIONS_RE = re.compile(
-    r"(?P<months>\dm)?(?P<weeks>\dw)?(?P<days>\dd)?(?P<hours>\dh)?"
-)
+DURATIONS_RE = re.compile(r"(?P<months>\dm)?(?P<weeks>\dw)?(?P<days>\dd)?(?P<hours>\dh)?")
 DEFAULT_DURATION = "7d"
 NOW = dt.utcnow()
 
@@ -81,17 +79,8 @@ def update_image_info(image, detail):
         image.update({"imagePushedAt": detail["imagePushedAt"]})
         if "imageScanFindingsSummary" in detail.keys():
             scan_details = detail["imageScanFindingsSummary"]
-            if (
-                "vulnerabilitySourceUpdatedAt" in scan_details.keys()
-                and scan_details["vulnerabilitySourceUpdatedAt"]
-            ):
-                image.update(
-                    {
-                        "vulnerabilitySourceUpdatedAt": scan_details[
-                            "vulnerabilitySourceUpdatedAt"
-                        ]
-                    }
-                )
+            if "vulnerabilitySourceUpdatedAt" in scan_details.keys() and scan_details["vulnerabilitySourceUpdatedAt"]:
+                image.update({"vulnerabilitySourceUpdatedAt": scan_details["vulnerabilitySourceUpdatedAt"]})
 
 
 def update_all_images_timestamp(repo_name, source_images, ecr_session=None):
@@ -108,9 +97,7 @@ def update_all_images_timestamp(repo_name, source_images, ecr_session=None):
     client = ecr_session.client("ecr")
     chunks = chunked_iterable(source_images, size=21)
     for chunk in chunks:
-        res = client.describe_images(
-            repositoryName=repo_name, imageIds=list(chunk), filter={"tagStatus": "ANY"}
-        )
+        res = client.describe_images(repositoryName=repo_name, imageIds=list(chunk), filter={"tagStatus": "ANY"})
         for detail in res["imageDetails"]:
             for image in source_images:
                 update_image_info(image, detail)
@@ -132,9 +119,7 @@ def list_all_images(repo_name, images=None, next_token=None, ecr_session=None):
     if images is None:
         images = []
     if not next_token:
-        res = client.list_images(
-            maxResults=42, repositoryName=repo_name, filter={"tagStatus": "ANY"}
-        )
+        res = client.list_images(maxResults=42, repositoryName=repo_name, filter={"tagStatus": "ANY"})
     else:
         res = client.list_images(
             maxResults=42,
@@ -168,17 +153,11 @@ def define_images_to_scan(images, duration_override=None, duration_env_key=None)
     images_to_scan = []
     scan_source = "imagePushedAt"
     for image in images:
-        if "vulnerabilitySourceUpdatedAt" in image.keys() and isinstance(
-            image["vulnerabilitySourceUpdatedAt"], dt
-        ):
+        if "vulnerabilitySourceUpdatedAt" in image.keys() and isinstance(image["vulnerabilitySourceUpdatedAt"], dt):
             scan_source = "vulnerabilitySourceUpdatedAt"
             checkpoint = image[scan_source]
 
-        if (
-            not checkpoint
-            and "imagePushedAt" in image.keys()
-            and isinstance(image["imagePushedAt"], dt)
-        ):
+        if not checkpoint and "imagePushedAt" in image.keys() and isinstance(image["imagePushedAt"], dt):
             checkpoint = image[scan_source]
         if checkpoint < delta:
             # print(f"Adding image due to {scan_source}", image[scan_source])
@@ -230,9 +209,7 @@ def trigger_images_scan(repo_name, images_to_scan, ecr_session=None):
                     print("The image does not support scanning.")
 
 
-def scan_repo_images(
-    repo, duration_override=None, no_scan_images=False, ecr_session=None
-):
+def scan_repo_images(repo, duration_override=None, no_scan_images=False, ecr_session=None):
     if ecr_session is None:
         ecr_session = session.Session()
     repo_images = list_all_images(repo, ecr_session=ecr_session)

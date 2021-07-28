@@ -43,4 +43,4 @@ def parse_scan_report(event, thresholds):
             for level, threshold in thresholds.items():
                 if level in findings.keys() and findings[level] >= threshold:
                     findings["reason"] = "Findings above defined thresholds"
-                    return findings, thresholds
+                    return findings, thresholds, scan_details["image-digest"], scan_details["image-tags"]
