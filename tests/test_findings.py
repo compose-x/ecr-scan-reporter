@@ -44,9 +44,7 @@ def with_no_findings():
         "account": "000000000000",
         "time": "2019-10-29T02:36:48Z",
         "region": "us-east-1",
-        "resources": [
-            "arn:aws:ecr:us-east-1:000000000000:repository/my-repository-name"
-        ],
+        "resources": ["arn:aws:ecr:us-east-1:000000000000:repository/my-repository-name"],
         "detail": {
             "scan-status": "COMPLETE",
             "repository-name": "my-repository-name",
@@ -66,9 +64,7 @@ def with_failed_scan():
         "account": "000000000000",
         "time": "2019-10-29T02:36:48Z",
         "region": "us-east-1",
-        "resources": [
-            "arn:aws:ecr:us-east-1:000000000000:repository/my-repository-name"
-        ],
+        "resources": ["arn:aws:ecr:us-east-1:000000000000:repository/my-repository-name"],
         "detail": {
             "scan-status": "FAILED",
             "repository-name": "my-repository-name",

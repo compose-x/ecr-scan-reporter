@@ -14,11 +14,7 @@ from boto3 import session
 
 from ecr_scan_reporter.ecr_scan_reporter import import_thresholds, parse_scan_report
 from ecr_scan_reporter.images_scanner import scan_repo_images
-from ecr_scan_reporter.repos_scanner import (
-    filter_repos_from_regexp,
-    job_dispatcher,
-    list_ecr_repos,
-)
+from ecr_scan_reporter.repos_scanner import filter_repos_from_regexp, job_dispatcher, list_ecr_repos
 
 
 def findings_handler(event, context):
@@ -74,20 +70,12 @@ def scans_job_handler(event, context):
     ):
         regexp_override = event["repositoriesFilterRegexp"]
     repos_list = list_ecr_repos(ecr_session=lambda_session)
-    filtered_repos_list = filter_repos_from_regexp(
-        repos_list, repos_names_filter=regexp_override
-    )
+    filtered_repos_list = filter_repos_from_regexp(repos_list, repos_names_filter=regexp_override)
     queue_url = environ.get("IMAGES_SCAN_JOBS_QUEUE_URL", None)
-    if (
-        "jobsQueueUrl" in event.keys()
-        and event["jobsQueueUrl"]
-        and isinstance(event["jobsQueueUrl"], str)
-    ):
+    if "jobsQueueUrl" in event.keys() and event["jobsQueueUrl"] and isinstance(event["jobsQueueUrl"], str):
         queue_url = event["jobsQueueUrl"]
     if queue_url is None:
-        warnings.warn(
-            "No QueueURL was provided. Attempting to complete task locally. Might run out of time"
-        )
+        warnings.warn("No QueueURL was provided. Attempting to complete task locally. Might run out of time")
     else:
         job_dispatcher(queue_url, filtered_repos_list, lambda_session)
 
