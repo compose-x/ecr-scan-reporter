@@ -17,6 +17,24 @@ from ecr_scan_reporter.images_scanner import scan_repo_images
 from ecr_scan_reporter.repos_scanner import filter_repos_from_regexp, job_dispatcher, list_ecr_repos
 
 
+def format_mail_message(reason, report):
+    """
+    Function to format a nice mail message with the breakdown of findings and thresholds
+
+    :param str reason:
+    :param tuple report:
+    :return: The mail string
+    :rtype: str
+    """
+    levels = [reason]
+    thresholds = report[1]
+    findings = report[0]
+    for level, value in thresholds.values():
+        if level in findings.keys():
+            levels.append(f"{level}: {findings[level]}/{value}\n")
+    return "\n".join(levels)
+
+
 def findings_handler(event, context):
     """
     Entry point fo lambda function
@@ -38,7 +56,7 @@ def findings_handler(event, context):
         reason = "Issue detected with the scan and or / findings."
     message_json = {
         "default": f"Vulnerabilities found above threshold for {repository_name} {reason}",
-        "email": f"Vulnerabilities found above threshold for {repository_name} {reason}",
+        "email": f"Vulnerabilities found above threshold for {repository_name}\n{format_mail_message(reason, report)}",
         "http": f"Vulnerabilities found above threshold for {repository_name} {reason}",
         "https": f"Vulnerabilities found above threshold for {repository_name} {reason}",
     }
