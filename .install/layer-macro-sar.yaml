@@ -13,7 +13,6 @@ Metadata:
           - ScanRate
           - ScanExpiryDuration
           - NotifyOnScanFailure
-          - NotificationEmail
         Label:
           default: ECR Scan Settings.
       - Parameters:
@@ -31,12 +30,39 @@ Metadata:
           - LowThreshold
         Label:
           default: Scan Vulnerabilities Threshold report.
+      - Parameters:
+          - NotificationEmail
+          - NotificationEmail2
+          - NotificationEmail3
+          - NotificationEmail4
+          - NotificationEmail5
+        Label:
+          default: Additional mail subscriptions
 
 Parameters:
   NotificationEmail:
     Type: String
     Default: none
     Description: Mail address to send notifications to. Optional.
+
+  NotificationEmail2:
+    Type: String
+    Default: none
+    Description: Mail address to send notifications to. Optional.
+  NotificationEmail3:
+    Type: String
+    Default: none
+    Description: Mail address to send notifications to. Optional.
+
+  NotificationEmail4:
+    Type: String
+    Default: none
+    Description: Mail address to send notifications to. Optional.
+
+  NotificationEmail5:
+    Type: String
+    Default: none
+    Description: Mail address to send notifications to. Optional
 
   PermissionsBoundary:
     Type: String
@@ -88,6 +114,11 @@ Parameters:
 
 Conditions:
   EmailNotificationCon: !Not [!Equals [!Ref NotificationEmail, "none"]]
+  EmailNotificationCon2: !Not [!Equals [!Ref NotificationEmail2, "none"]]
+  EmailNotificationCon3: !Not [!Equals [!Ref NotificationEmail3, "none"]]
+  EmailNotificationCon4: !Not [!Equals [!Ref NotificationEmail4, "none"]]
+  EmailNotificationCon5: !Not [!Equals [!Ref NotificationEmail5, "none"]]
+
   PermissionsBoundaryCon: !Not [!Equals [!Ref PermissionsBoundary, "none"]]
   OverrideLayerVersion: !Not [!Equals [!Ref LambdaLayerVersionArn, "none"]]
   NotNotifyOnScanFailureCon: !Equals [!Ref NotifyOnScanFailure, "False"]
@@ -109,6 +140,46 @@ Resources:
     Condition: EmailNotificationCon
     Properties:
       Endpoint: !Ref NotificationEmail
+      Protocol: email
+      TopicArn: !Ref NotificationsTopic
+
+  MailNofitication2:
+    Type: AWS::SNS::Subscription
+    DependsOn:
+      - NotificationsTopic
+    Condition: EmailNotificationCon2
+    Properties:
+      Endpoint: !Ref NotificationEmail2
+      Protocol: email
+      TopicArn: !Ref NotificationsTopic
+
+  MailNofitication3:
+    Type: AWS::SNS::Subscription
+    DependsOn:
+      - NotificationsTopic
+    Condition: EmailNotificationCon3
+    Properties:
+      Endpoint: !Ref NotificationEmail3
+      Protocol: email
+      TopicArn: !Ref NotificationsTopic
+
+  MailNofitication4:
+    Type: AWS::SNS::Subscription
+    DependsOn:
+      - NotificationsTopic
+    Condition: EmailNotificationCon4
+    Properties:
+      Endpoint: !Ref NotificationEmail4
+      Protocol: email
+      TopicArn: !Ref NotificationsTopic
+
+  MailNofitication5:
+    Type: AWS::SNS::Subscription
+    DependsOn:
+      - NotificationsTopic
+    Condition: EmailNotificationCon5
+    Properties:
+      Endpoint: !Ref NotificationEmail5
       Protocol: email
       TopicArn: !Ref NotificationsTopic
 
