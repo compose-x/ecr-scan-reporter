@@ -111,3 +111,4 @@ ENV/
 *portal.sso.GetRoleCredentials*.json
 codebuild_build.sh
 docs/ecr_scan_reporter.rst
+poetry.lock

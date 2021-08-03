@@ -7,10 +7,10 @@ import placebo
 import pytest
 from boto3 import session
 
-HERE = path.abspath(path.dirname(__file__))
-
 from ecr_scan_reporter.ecr_scan_reporter import import_thresholds, parse_scan_report
 from ecr_scan_reporter.lambda_functions import findings_handler
+
+HERE = path.abspath(path.dirname(__file__))
 
 
 @pytest.fixture()

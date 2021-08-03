@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 ecr_scan_reporter tests
+	flake8 ecr_scan_reporter
 
 test: ## run tests quickly with the default Python
 	pytest

@@ -6,13 +6,10 @@
 from os import path
 
 import placebo
-import pytest
 from boto3 import session
 
 HERE = path.abspath(path.dirname(__file__))
 
-
-from ecr_scan_reporter import ecr_scan_reporter
 from ecr_scan_reporter.images_scanner import (
     define_images_to_scan,
     list_all_images,
