@@ -59,16 +59,16 @@ def findings_handler(event, context):
     image_id = report[2]
     if report[3]:
         image_id = ",".join(report[3])
+    intro = "Vulnerabilities found above threshold for"
     message_json = {
-        "default": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
-        "email": f"Vulnerabilities found above threshold for {repository_name}@{image_id}\n{format_mail_message(reason, report)}",
-        "http": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
-        "https": f"Vulnerabilities found above threshold for {repository_name}@{image_id} {reason}",
+        "default": f"{intro} {repository_name}@{image_id} {reason}",
+        "email": f"{intro} {repository_name}@{image_id}\n{format_mail_message(reason, report)}",
+        "http": f"{intro} {repository_name}@{image_id} {reason}",
+        "https": f"{intro} {repository_name}@{image_id} {reason}",
     }
-    print(message_json)
     if not environ.get("ECR_SNS_REPORT_TOPIC_ARN", None):
         return
-    res = sns.publish(
+    sns.publish(
         TopicArn=environ.get("ECR_SNS_REPORT_TOPIC_ARN", None),
         Message=dumps(message_json, ensure_ascii=True),
         Subject=f"ECR Image Scan Vulnerabilities - {repository_name}",
