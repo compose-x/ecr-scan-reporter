@@ -209,10 +209,11 @@ def trigger_images_scan(repo_name, images_to_scan, ecr_session=None):
                     print("The image does not support scanning.")
 
 
-def scan_repo_images(repo, duration_override=None, no_scan_images=False, ecr_session=None):
+def scan_repo_images(repo, repo_images=None, duration_override=None, no_scan_images=False, ecr_session=None):
     if ecr_session is None:
         ecr_session = session.Session()
-    repo_images = list_all_images(repo, ecr_session=ecr_session)
+    if not repo_images:
+        repo_images = list_all_images(repo, ecr_session=ecr_session)
     update_all_images_timestamp(repo, repo_images, ecr_session=ecr_session)
     images_to_scan = define_images_to_scan(repo_images, duration_override)
     if images_to_scan:

@@ -11,10 +11,12 @@ from json import JSONDecodeError, dumps, loads
 from os import environ
 
 from boto3 import session
+from compose_x_common.compose_x_common import keyisset
 
 from ecr_scan_reporter.ecr_scan_reporter import import_thresholds, parse_scan_report
 from ecr_scan_reporter.images_scanner import scan_repo_images
 from ecr_scan_reporter.repos_scanner import filter_repos_from_regexp, job_dispatcher, list_ecr_repos
+from ecr_scan_reporter.services_scanner import handle_ecs_discovery
 
 
 def format_mail_message(reason, report):
@@ -86,21 +88,22 @@ def scans_job_handler(event, context):
     :return:
     """
     lambda_session = session.Session()
-    regexp_override = environ.get("REPOSITORIES_FILTER_REGEXP", None)
-    if (
-        "repositoriesFilterRegexp" in event.keys()
-        and event["repositoriesFilterRegexp"]
-        and isinstance(event["repositoriesFilterRegexp"], str)
-    ):
-        regexp_override = event["repositoriesFilterRegexp"]
-    repos_list = list_ecr_repos(ecr_session=lambda_session)
-    filtered_repos_list = filter_repos_from_regexp(repos_list, repos_names_filter=regexp_override)
     queue_url = environ.get("IMAGES_SCAN_JOBS_QUEUE_URL", None)
     if "jobsQueueUrl" in event.keys() and event["jobsQueueUrl"] and isinstance(event["jobsQueueUrl"], str):
         queue_url = event["jobsQueueUrl"]
     if queue_url is None:
-        warnings.warn("No QueueURL was provided. Attempting to complete task locally. Might run out of time")
+        raise ValueError("No QueueURL was provided. Attempting to complete task locally. Might run out of time")
+    regexp_override = environ.get("REPOSITORIES_FILTER_REGEXP", None)
+    if keyisset("repositoriesFilterRegexp", event) and isinstance(event["repositoriesFilterRegexp"], str):
+        regexp_override = event["repositoriesFilterRegexp"]
+    ecs_based_discovery_roles = environ.get("ECS_DISCOVERY_ROLES", None)
+    if keyisset("ecsDiscoveryRoles", event) and isinstance(event["ecsDiscoveryRoles"], (str, list)):
+        ecs_based_discovery_roles = event["ecsDiscoveryRoles"]
+    if ecs_based_discovery_roles or environ.get("ECS_DISCOVERY_ENABLED", False):
+        handle_ecs_discovery(ecs_based_discovery_roles, lambda_session=lambda_session)
     else:
+        repos_list = list_ecr_repos(ecr_session=lambda_session)
+        filtered_repos_list = filter_repos_from_regexp(repos_list, repos_names_filter=regexp_override)
         job_dispatcher(queue_url, filtered_repos_list, lambda_session)
 
 
@@ -125,4 +128,6 @@ def repo_images_scanning_handler(event, context):
             raise TypeError("The body is of type", type(message), "Expected", str)
         if "repositoryName" not in body.keys():
             raise KeyError("No repositoryName was provided")
-        scan_repo_images(body["repositoryName"], ecr_session=lambda_session)
+        images = body["images"] if keyisset("images", body) else []
+        repo_name = body["repositoryName"]
+        scan_repo_images(repo=repo_name, repo_images=images, ecr_session=lambda_session)

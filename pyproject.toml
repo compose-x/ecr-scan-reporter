@@ -24,6 +24,7 @@ include = [
 python = "^3.7"
 boto3 = "^1.18"
 pytz = "^2021.1"
+compose-x-common = {extras = ["aws"], version = "^0.1.1"}
 
 [tool.poetry.dev-dependencies]
 sphinx-material = "^0.0.34"

@@ -96,5 +96,5 @@ install: clean ## install the package to the active Python's site-packages
 
 conform	: ## Conform to a standard of coding syntax
 	isort --profile black ecr_scan_reporter
-	black ecr_scan_reporter tests setup.py
+	black ecr_scan_reporter tests
 	find ecr_scan_reporter -name "*.json" -type f  -exec sed -i '1s/^\xEF\xBB\xBF//' {} +
