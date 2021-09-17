@@ -19,11 +19,20 @@ phases:
       - SUFFIX=${COMMIT_HASH:-$EPOCH}
       - if [ $USE_EPOCH -eq 1 ]; then SUFFIX=$EPOCH; fi
       - (pip --version && pip install pip -U --no-cache-dir) && pip install wheel --no-cache-dir
-
+      - python -m pip install poetry
+      - POETRY_BIN_FILE=`find /root/.pyenv -name poetry -type f 2>/dev/null`
+      - echo $POETRY_BIN_FILE
+      - POETRY_BIN_DIR=$(dirname "${POETRY_BIN_FILE}")
+      - PATH=$POETRY_BIN_DIR:$PATH
+      - poetry env use system
+      - poetry install
+      - POETRY_ENV=`poetry env info --path`
+      - echo $POETRY_ENV
+      - PATH=$POETRY_ENV/bin:$PATH
   build:
     commands:
       - python --version
-      - python setup.py sdist bdist_wheel
+      - poetry build
       - BUILD_WHL=`find . -name "ecr_scan_reporter*.whl" -type f`
       - echo $BUILD_WHL
       - PY_BUILD=python/lib/python${PY_VERSION}/site-packages/

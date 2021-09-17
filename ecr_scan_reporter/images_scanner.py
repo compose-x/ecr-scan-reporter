@@ -14,6 +14,7 @@ from os import environ
 from time import sleep
 
 from boto3 import session
+from compose_x_common.compose_x_common import keyisset
 from dateutil.relativedelta import relativedelta
 from pytz import utc
 
@@ -75,32 +76,47 @@ def update_image_info(image, detail):
     :param dict detail:
     :return:
     """
-    if image["imageDigest"] == detail["imageDigest"]:
+    if not keyisset("imageDigest", image) and not keyisset("imageTag", image):
+        print(f"No imageDigest or imageTag provided for {image}")
+        return
+    if keyisset("imageDigest", image) and image["imageDigest"] == detail["imageDigest"]:
         image.update({"imagePushedAt": detail["imagePushedAt"]})
-        if "imageScanFindingsSummary" in detail.keys():
+        if keyisset("imageScanFindingsSummary", detail):
             scan_details = detail["imageScanFindingsSummary"]
-            if "vulnerabilitySourceUpdatedAt" in scan_details.keys() and scan_details["vulnerabilitySourceUpdatedAt"]:
+            if keyisset("vulnerabilitySourceUpdatedAt", scan_details) and scan_details["vulnerabilitySourceUpdatedAt"]:
                 image.update({"vulnerabilitySourceUpdatedAt": scan_details["vulnerabilitySourceUpdatedAt"]})
 
 
-def update_all_images_timestamp(repo_name, source_images, ecr_session=None):
+def update_all_images_timestamp(repo_name, source_images, batch=False, ecr_session=None):
     """
     Function to describe images to retrieve additional information (imagePushedAt) to then be able to evaluate
     whether we want to scan that image
 
     :param str repo_name:
     :param list source_images:
+    :param bool batch:
     :param boto3.session.Session ecr_session:
     """
     if not ecr_session:
         ecr_session = session.Session()
     client = ecr_session.client("ecr")
-    chunks = chunked_iterable(source_images, size=21)
-    for chunk in chunks:
-        res = client.describe_images(repositoryName=repo_name, imageIds=list(chunk), filter={"tagStatus": "ANY"})
-        for detail in res["imageDetails"]:
-            for image in source_images:
-                update_image_info(image, detail)
+    if batch:
+        chunk_size = 21
+    else:
+        chunk_size = 1
+    chunks = chunked_iterable(source_images, size=chunk_size)
+    for image in chunks:
+        try:
+            res = client.describe_images(repositoryName=repo_name, imageIds=list(image), filter={"tagStatus": "ANY"})
+            for detail in res["imageDetails"]:
+                for chunk in image:
+                    update_image_info(chunk, detail)
+        except client.exceptions.ImageNotFoundException:
+            print(f"Could not find image {image} in repo {repo_name}.")
+            warnings.warn(
+                "If you are using ECS discovery, this can lead into critical issues and new services"
+                " deployments failures!"
+            )
 
 
 def list_all_images(repo_name, images=None, next_token=None, ecr_session=None):
@@ -153,13 +169,13 @@ def define_images_to_scan(images, duration_override=None, duration_env_key=None)
     images_to_scan = []
     scan_source = "imagePushedAt"
     for image in images:
-        if "vulnerabilitySourceUpdatedAt" in image.keys() and isinstance(image["vulnerabilitySourceUpdatedAt"], dt):
+        if keyisset("vulnerabilitySourceUpdatedAt", image) and isinstance(image["vulnerabilitySourceUpdatedAt"], dt):
             scan_source = "vulnerabilitySourceUpdatedAt"
             checkpoint = image[scan_source]
 
-        if not checkpoint and "imagePushedAt" in image.keys() and isinstance(image["imagePushedAt"], dt):
+        if not checkpoint and keyisset("imagePushedAt", image) and isinstance(image["imagePushedAt"], dt):
             checkpoint = image[scan_source]
-        if checkpoint < delta:
+        if checkpoint and isinstance(checkpoint, dt) and checkpoint < delta:
             # print(f"Adding image due to {scan_source}", image[scan_source])
             images_to_scan.append(image)
     return images_to_scan
@@ -180,12 +196,17 @@ def trigger_images_scan(repo_name, images_to_scan, ecr_session=None):
     chunks = chunked_iterable(images_to_scan, size=4)
     for images in chunks:
         for image in images:
+            if not keyisset("imageDigest", image) and not keyisset("imageTag", image):
+                warnings.warn(f"Neither imageDigest nor imageTag provided in {repo_name} - {image}.")
+                continue
             tries = 3
             attempts_max = 4
             while tries:
                 try:
-                    image_id = {"imageDigest": image["imageDigest"]}
-                    if "imageTag" in image.keys():
+                    image_id = {}
+                    if keyisset("imageDigest", image):
+                        image_id["imageDigest"] = image["imageDigest"]
+                    if keyisset("imageTag", image):
                         image_id["imageTag"] = image["imageTag"]
                     client.start_image_scan(
                         repositoryName=repo_name,
@@ -200,23 +221,24 @@ def trigger_images_scan(repo_name, images_to_scan, ecr_session=None):
                         f"{((attempts_max - tries) * 10)} seconds"
                     )
                 except client.exceptions.ImageNotFoundException:
-                    print(
-                        "No image found with provided tag or digest.",
-                        image["imageTag"],
-                        image["imageDigest"],
-                    )
+                    print("No image found with provided tag or digest.", image)
+                    tries = 0
                 except client.exceptions.UnsupportedImageTypeException:
                     print("The image does not support scanning.")
+                    tries = 0
 
 
-def scan_repo_images(repo, duration_override=None, no_scan_images=False, ecr_session=None):
+def scan_repo_images(repo, repo_images=None, duration_override=None, no_scan_images=False, ecr_session=None):
     if ecr_session is None:
         ecr_session = session.Session()
-    repo_images = list_all_images(repo, ecr_session=ecr_session)
-    update_all_images_timestamp(repo, repo_images, ecr_session=ecr_session)
+    batch = False
+    if not repo_images:
+        repo_images = list_all_images(repo, ecr_session=ecr_session)
+        batch = True
+    update_all_images_timestamp(repo, repo_images, batch=batch, ecr_session=ecr_session)
     images_to_scan = define_images_to_scan(repo_images, duration_override)
     if images_to_scan:
-        print("There are images that require scanning.")
+        print(f"{repo} - There are {len(images_to_scan)} images that require scanning.")
         if no_scan_images:
             print("Skipping scan due to --no-scanning")
             return

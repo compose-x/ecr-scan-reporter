@@ -24,13 +24,14 @@ include = [
 python = "^3.7"
 boto3 = "^1.18"
 pytz = "^2021.1"
+compose-x-common = {extras = ["aws"], version = "^0.1.1"}
 
 [tool.poetry.dev-dependencies]
 sphinx-material = "^0.0.34"
-Sphinx = "^4.1.2"
+Sphinx = "^4.2.0"
 black = "^21.7b0"
 isort = "^5.9.3"
-tbump = "6.3.1"
+tbump = "6.4.0"
 placebo = "^0.9.0"
 behave = "^1.2.6"
 pytest = "^6.2.4"
