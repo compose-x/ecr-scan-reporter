@@ -20,6 +20,20 @@ which will be triggered based on their usage. It will also be deploying a Lambda
 application source code of this repository so to make it simple to update all 3 functions together without making their
 code too complex.
 
+Scan images based on ECS Task Definitions
+++++++++++++++++++++++++++++++++++++++++++++
+
+If you have a lot of images and repositories, it might be more beneficial to scan only the images that are currently
+in-use in AWS ECS. AWS ECS Task Definitions can be used to create services into AWS ECS Clusters, and contain the definition
+of the containers to use for the service.
+
+By defining **ECS_DISCOVERY_ROLES** (Parameter *ScanFromEcsIamRoles* in CloudFormation) the Lambda function will assume
+role (same or cross-account, so long as it allows to describe ECS task definitions), retrieve the repository and images
+to perform the scan for.
+
+.. hint::
+
+    This feature is (currently) only available currently via using AWS Lambda.
 
 As CLI
 -------
