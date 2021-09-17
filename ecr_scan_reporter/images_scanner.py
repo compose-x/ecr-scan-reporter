@@ -105,11 +105,12 @@ def update_all_images_timestamp(repo_name, source_images, batch=False, ecr_sessi
     else:
         chunk_size = 1
     chunks = chunked_iterable(source_images, size=chunk_size)
-    for image in source_images:
+    for image in chunks:
         try:
-            res = client.describe_images(repositoryName=repo_name, imageIds=[image], filter={"tagStatus": "ANY"})
+            res = client.describe_images(repositoryName=repo_name, imageIds=list(image), filter={"tagStatus": "ANY"})
             for detail in res["imageDetails"]:
-                update_image_info(image, detail)
+                for chunk in image:
+                    update_image_info(chunk, detail)
         except client.exceptions.ImageNotFoundException:
             print(f"Could not find image {image} in repo {repo_name}.")
             warnings.warn(
