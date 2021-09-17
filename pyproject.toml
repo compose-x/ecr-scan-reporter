@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ecr_scan_reporter"
-version = "0.4.0"
+version = "0.4.1"
 description = "Stay on top of your docker images security vulnerabilities in AWS ECR"
 authors = ["John Preston <john@compose-x.io>"]
 license = "MPL-2.0"
@@ -62,7 +62,7 @@ known_first_party = "kelvin"
 github_url = "https://github.com/compose-x/ecr-scan-reporter"
 
 [tool.tbump.version]
-current = "0.4.0"
+current = "0.4.1"
 
 regex = '''
   (?P<major>\d+)
