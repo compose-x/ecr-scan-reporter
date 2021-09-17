@@ -100,11 +100,16 @@ def scans_job_handler(event, context):
     if keyisset("ecsDiscoveryRoles", event) and isinstance(event["ecsDiscoveryRoles"], (str, list)):
         ecs_based_discovery_roles = event["ecsDiscoveryRoles"]
     if ecs_based_discovery_roles or environ.get("ECS_DISCOVERY_ENABLED", False):
-        handle_ecs_discovery(ecs_based_discovery_roles, lambda_session=lambda_session)
+        print("Using ECS discovery base images.")
+        jobs = handle_ecs_discovery(ecs_based_discovery_roles, lambda_session=lambda_session)
+        job_dispatcher(queue_url, jobs, lambda_session)
     else:
         repos_list = list_ecr_repos(ecr_session=lambda_session)
         filtered_repos_list = filter_repos_from_regexp(repos_list, repos_names_filter=regexp_override)
-        job_dispatcher(queue_url, filtered_repos_list, lambda_session)
+        jobs = []
+        for repo_name in filtered_repos_list:
+            jobs.append({"repositoryName": repo_name})
+        job_dispatcher(queue_url, jobs, lambda_session)
 
 
 def repo_images_scanning_handler(event, context):
@@ -130,4 +135,5 @@ def repo_images_scanning_handler(event, context):
             raise KeyError("No repositoryName was provided")
         images = body["images"] if keyisset("images", body) else []
         repo_name = body["repositoryName"]
+        print("Images to scan from payload.", repo_name, images)
         scan_repo_images(repo=repo_name, repo_images=images, ecr_session=lambda_session)

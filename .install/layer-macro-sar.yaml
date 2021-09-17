@@ -40,6 +40,18 @@ Metadata:
           default: Additional mail subscriptions
 
 Parameters:
+
+  ScanFromEcs:
+    Type: String
+    Default: "False"
+    AllowedValues: ["True", "False"]
+    Description: Whether or not scan images used in ECS Task Definitions. True if Roles are set.
+
+  ScanFromEcsIamRoles:
+    Type: CommaDelimitedList
+    Default: "none"
+    Description: IAM Roles to use for ECS Tasks scanning to allow multi-accounts.
+
   NotificationEmail:
     Type: String
     Default: none
@@ -123,6 +135,14 @@ Conditions:
   OverrideLayerVersion: !Not [!Equals [!Ref LambdaLayerVersionArn, "none"]]
   NotNotifyOnScanFailureCon: !Equals [!Ref NotifyOnScanFailure, "False"]
 
+  ScanWithEcsCon: !Equals [!Ref ScanFromEcs, "True"]
+  ScanWithEcsIamRolesCon: !Not
+    - !Equals
+      - !Select [0, !Ref ScanFromEcsIamRoles]
+      - "none"
+  UseEcsScanningCon: !Or
+    - !Condition ScanWithEcsCon
+    - !Condition ScanWithEcsIamRolesCon
 
 Resources:
   NotificationsTopic:
@@ -186,6 +206,7 @@ Resources:
   JobsQueue:
     Type: AWS::SQS::Queue
     Properties:
+      VisibilityTimeout: 300
       Tags:
         - Key: Description
           Value: SQS Queues for Images scanning distribution
@@ -356,7 +377,7 @@ Resources:
     Properties:
       Runtime: python3.8
       Handler: index.lambda_handler
-      Timeout: 30
+      Timeout: 150
       Role: !GetAtt imagesScannerFunctionRole.Arn
       Layers:
         - Fn::If:
@@ -370,9 +391,9 @@ Resources:
         SqsInvoke:
           Type: SQS
           Properties:
-            BatchSize: 10
+            BatchSize: 1
             Enabled: true
-            MaximumBatchingWindowInSeconds: 30
+            MaximumBatchingWindowInSeconds: 120
             Queue: !GetAtt JobsQueue.Arn
 
       InlineCode: |
@@ -418,6 +439,24 @@ Resources:
                 Resource:
                   - !GetAtt JobsQueue.Arn
 
+  assumeRolePolicy:
+    Type: AWS::IAM::Policy
+    DependsOn:
+      - repositoriesScannerFunctionRole
+    Condition: ScanWithEcsIamRolesCon
+    Properties:
+      Roles:
+        - !Ref repositoriesScannerFunctionRole
+      PolicyName: AssumeRoleForEcsBasedScan
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AccessAssumeRoleForEcsScan
+            Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Resource: !Ref ScanFromEcsIamRoles
+
   repositoriesScannerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -428,6 +467,15 @@ Resources:
       Environment:
         Variables:
           IMAGES_SCAN_JOBS_QUEUE_URL: !Ref JobsQueue
+          ECS_DISCOVERY_ROLES: !If
+            - ScanWithEcsIamRolesCon
+            - !Join [ ",", !Ref ScanFromEcsIamRoles ]
+            - !Ref AWS::NoValue
+          ECS_DISCOVERY_ENABLED: !If
+            - UseEcsScanningCon
+            - "True"
+            - !Ref AWS::NoValue
+
       Layers:
         - Fn::If:
             - OverrideLayerVersion

@@ -75,25 +75,13 @@ def job_dispatcher(queue_url, repos, sqs_session=None):
     Sends a new job in SQS to distribute the images listing and scan for a given repository
 
     :param str queue_url:
-    :param list repos:
+    :param list[dict] repos:
     :param boto3.session.Session sqs_session:
     :return:
     """
     if not sqs_session:
         sqs_session = session.Session()
     client = sqs_session.client("sqs")
-    if len(repos) == 1:
-        client.send_message(
-            QueueUrl=queue_url,
-            MessageBody=dumps({"repositoryName": repos[0]}),
-        )
-        return
-    repos_bodies = []
     for repo in repos:
-        repos_bodies.append(dumps({"repositoryName": repo}))
-    repos_chunks = chunked_iterable(repos_bodies, size=10)
-    for chunk in repos_chunks:
-        entries = []
-        for repo in chunk:
-            entries.append({"Id": str(uuid.uuid4()), "MessageBody": repo})
-        client.send_message_batch(QueueUrl=queue_url, Entries=entries)
+        print(f"Sending job for {repo['repositoryName']}")
+        client.send_message(QueueUrl=queue_url, MessageBody=dumps(repo))

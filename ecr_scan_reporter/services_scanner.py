@@ -128,14 +128,3 @@ def handle_ecs_discovery(roles=None, lambda_session=None):
                 images_ids.append({"imageTag": tag})
             jobs.append({"repositoryName": repo_name, "images": images_ids, "registryId": registry_id})
     return jobs
-
-
-if __name__ == "__main__":
-    import json
-    import os
-
-    SESSION = Session(profile_name="sc-infra-mgmt")
-    REG = handle_ecs_discovery(
-        roles=[os.environ.get("INFRA_NONPROD_RO"), os.environ.get("INFRA_PROD_RO")], lambda_session=SESSION
-    )
-    print(json.dumps(REG, indent=2))
