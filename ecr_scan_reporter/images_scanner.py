@@ -87,18 +87,24 @@ def update_image_info(image, detail):
                 image.update({"vulnerabilitySourceUpdatedAt": scan_details["vulnerabilitySourceUpdatedAt"]})
 
 
-def update_all_images_timestamp(repo_name, source_images, ecr_session=None):
+def update_all_images_timestamp(repo_name, source_images, batch=False, ecr_session=None):
     """
     Function to describe images to retrieve additional information (imagePushedAt) to then be able to evaluate
     whether we want to scan that image
 
     :param str repo_name:
     :param list source_images:
+    :param bool batch:
     :param boto3.session.Session ecr_session:
     """
     if not ecr_session:
         ecr_session = session.Session()
     client = ecr_session.client("ecr")
+    if batch:
+        chunk_size = 21
+    else:
+        chunk_size = 1
+    chunks = chunked_iterable(source_images, size=chunk_size)
     for image in source_images:
         try:
             res = client.describe_images(repositoryName=repo_name, imageIds=[image], filter={"tagStatus": "ANY"})
@@ -224,9 +230,11 @@ def trigger_images_scan(repo_name, images_to_scan, ecr_session=None):
 def scan_repo_images(repo, repo_images=None, duration_override=None, no_scan_images=False, ecr_session=None):
     if ecr_session is None:
         ecr_session = session.Session()
+    batch = False
     if not repo_images:
         repo_images = list_all_images(repo, ecr_session=ecr_session)
-    update_all_images_timestamp(repo, repo_images, ecr_session=ecr_session)
+        batch = True
+    update_all_images_timestamp(repo, repo_images, batch=batch, ecr_session=ecr_session)
     images_to_scan = define_images_to_scan(repo_images, duration_override)
     if images_to_scan:
         print(f"{repo} - There are {len(images_to_scan)} images that require scanning.")
