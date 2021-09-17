@@ -50,7 +50,9 @@ def main():
     print("Repos found with provided parameters", filtered_repos)
     for repo in filtered_repos:
         print(f"Analyzing images of {repo}")
-        scan_repo_images(repo, args.duration_override, args.no_scanning, cli_session)
+        scan_repo_images(
+            repo, duration_override=args.duration_override, no_scan_images=args.no_scanning, ecr_session=cli_session
+        )
     return 0
 
 

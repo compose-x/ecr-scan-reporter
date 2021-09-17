@@ -6,7 +6,7 @@ FROM $BASE_IMAGE as builder
 
 WORKDIR /opt
 COPY ecr_scan_reporter /opt/ecr_scan_reporter
-COPY setup.py pyproject.toml MANIFEST.in README.rst LICENSE /opt/
+COPY pyproject.toml MANIFEST.in README.rst LICENSE /opt/
 RUN python -m pip install pip -U; python -m pip install poetry; poetry build
 
 FROM $BASE_IMAGE
