@@ -1,5 +1,3 @@
-#  -*- coding: utf-8 -*-
-
 """Top-level package for ECR Scan Reporter."""
 
 __author__ = """John Preston"""
