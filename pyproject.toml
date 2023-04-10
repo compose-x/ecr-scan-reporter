@@ -9,7 +9,6 @@ classifiers = [
   "Intended Audience :: Developers",
   "Natural Language :: English",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -22,22 +21,21 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 boto3 = "^1.22"
-pytz = "^2022.1"
-compose-x-common = "^1.0"
+pytz = "^2023.3"
+compose-x-common = "^1.2"
 
 [tool.poetry.dev-dependencies]
 sphinx-material = "^0.0.35"
 Sphinx = "^4.5.0"
-black = "^22.3"
-isort = "^5.10.1"
+black = "^23.3"
+isort = "^5.12"
 tbump = "^6.7,<7.0"
 placebo = "<1.0"
 behave = "^1.2.6"
 pytest = "^7.1"
-pre-commit = "^2.19.0"
-tox = "^3.25.0"
+pre-commit = "^3.2"
 
 [tool.poetry.scripts]
 ecr_scan_reporter = "ecr_scan_reporter.cli:main"

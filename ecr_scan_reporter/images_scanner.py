@@ -13,6 +13,7 @@ from os import environ
 from time import sleep
 
 from boto3 import session
+from botocore.exceptions import ClientError
 from compose_x_common.compose_x_common import keyisset
 from dateutil.relativedelta import relativedelta
 from pytz import utc
@@ -224,6 +225,12 @@ def trigger_images_scan(repo_name, images_to_scan, ecr_session=None):
                     tries = 0
                 except client.exceptions.UnsupportedImageTypeException:
                     print("The image does not support scanning.")
+                    tries = 0
+                except client.exceptions.InvalidParameterException as error:
+                    print(f"The scan could not be started on this repository image: {error}.")
+                    tries = 0
+                except ClientError as error:
+                    print(f"Failed to trigger scan: {error}")
                     tries = 0
 
 
